@@ -11,6 +11,7 @@ import busRoutes from "./routes/busRoutes"
 import routeRoutes from "./routes/routeRoutes"
 import tripRoutes from "./routes/tripRoutes"
 import bookingRoutes from "./routes/bookingRoutes"
+import feedbackRoutes from "./routes/feedbackRoutes"
 
 dotenv.config()
 
@@ -23,6 +24,8 @@ app.use("/api/v1/buses", busRoutes)
 app.use("/api/v1/routes", routeRoutes)
 app.use("/api/v1/trips", tripRoutes)
 app.use("/api/v1/bookings", bookingRoutes)
+app.use("/api/v1/feedback", feedbackRoutes)
+
 
 const PORT = process.env.PORT || 5000
 const MONGODB_URI = process.env.MONGODB_URI as string

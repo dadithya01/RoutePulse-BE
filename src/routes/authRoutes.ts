@@ -1,14 +1,15 @@
 import { Router } from "express"
-import { getMyDetails, login, refreshToken, registerAdmin, registerUser } from "../controller/authController"
+import { getMyDetails, login, refreshToken, register} from "../controller/authController"
 import { authenticate } from "../middleware/auth"
+import { getUserDashboard } from "../controller/userDashboard"
 
 const router = Router()
 
-router.post("/register", registerUser)
 router.post("/login", login)
 router.get("/me", authenticate, getMyDetails)
 router.post("/refresh", refreshToken)
-router.post("/admin/register", registerAdmin)
+router.post("/register", register)
+router.get("/user/dashboard", authenticate, getUserDashboard)
 // router.post("/admin/register", authenticate, requireRole([UserRole.ADMIN]), registerAdmin)
 
 export default router

@@ -6,7 +6,7 @@ import { UserRole } from "../models/userModel"
 
 const router = Router()
 
-router.get("/", authenticate, getAllRoutes)
+router.get("/", authenticate,requireRole([UserRole.ADMIN, UserRole.USER]), getAllRoutes)
 router.post("/", authenticate, requireRole([UserRole.ADMIN]), createRoute)
 
 export default router

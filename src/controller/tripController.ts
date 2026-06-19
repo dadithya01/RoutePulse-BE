@@ -20,25 +20,8 @@ export const createTrip = async (req: Request, res: Response) => {
 
 export const getTrips = async (req: Request, res: Response) => {
   try {
-    const { from, to, date } = req.query
-    if (!from || !to || !date) {
-      return res.status(400).json({ message: "Missing lookup params (from, to, date)." })
-    }
-
-    const route = await RouteModel.findOne({ from: String(from), to: String(to) })
-    if (!route) return res.status(200).json({ message: "success", data: [] })
-
-    const start = new Date(String(date))
-    start.setHours(0, 0, 0, 0)
-    const end = new Date(String(date))
-    end.setHours(23, 59, 59, 999)
-
-    const trips = await TripModel.find({
-      routeId: route._id,
-      departureTime: { $gte: start, $lte: end }
-    }).populate("busId").populate("routeId")
-
-    res.status(200).json({ message: "success", data: trips })
+    const route = await RouteModel.find()
+    return res.status(200).json({ message: "success", data: [route] })
   } catch (err) {
     res.status(500).json({ message: "Server error" })
   }

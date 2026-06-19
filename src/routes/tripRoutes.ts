@@ -6,8 +6,8 @@ import { UserRole } from "../models/userModel"
 
 const router = Router()
 
-router.get("/", getTrips)
-router.get("/:id", getTripById)
-router.post("/", authenticate, requireRole([UserRole.ADMIN, UserRole.MANAGER]), createTrip)
+router.get("/", authenticate, requireRole([UserRole.ADMIN, UserRole.USER]), getTrips)
+router.get("/:id", authenticate, requireRole([UserRole.ADMIN, UserRole.USER]), getTripById)
+router.post("/", authenticate, requireRole([UserRole.ADMIN]), createTrip)
 
 export default router

@@ -9,26 +9,68 @@ import jwt from "jsonwebtoken"
 dotenv.config()
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string
 
-export const registerUser = async (req: Request, res: Response) => {
+export const register = async (req: Request, res: Response) => {
   try {
-    const { name, email, password } = req.body
-    const exUser = await UserModel.findOne({ email })
-    if (exUser) return res.status(400).json({ message: "User already exists..!" })
+    const {
+      name,
+      email,
+      password,
+      roles,
+      licenseNumber,
+      licenseExpiry,
+      experienceYears,
+      emergencyContact
+    } = req.body
 
-    const salt = bcrypt.genSaltSync(10)
-    const hashedPassword = bcrypt.hashSync(password, salt)
+    // 1. check existing user
+    const existing = await UserModel.findOne({ email })
+    if (existing) {
+      return res.status(400).json({ message: "User already exists" })
+    }
 
-    const newUser = new UserModel({
+    // 2. hash password
+    const hashedPassword = await bcrypt.hash(password, 10)
+
+    // 3. decide role safely
+    let finalRoles: UserRole[] = [UserRole.USER]
+
+    if (roles?.includes("DRIVER")) {
+      finalRoles = [UserRole.DRIVER]
+    }
+
+    if (roles?.includes("ADMIN")) {
+      finalRoles = [UserRole.ADMIN]
+    }
+
+    // 4. create user
+    const user = await UserModel.create({
       name,
       email,
       password: hashedPassword,
-      roles: [UserRole.USER],
-      approved: true
+      roles: finalRoles,
+
+      // driver fields (optional)
+      licenseNumber,
+      licenseExpiry: licenseExpiry ? new Date(licenseExpiry) : undefined,
+      experienceYears: Number(experienceYears) || 0,
+      emergencyContact
     })
-    await newUser.save()
-    res.status(201).json({ message: "User registered successfully..!" })
+
+    // 5. return response
+    return res.status(201).json({
+      message: "Registration successful",
+      data: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        roles: user.roles
+      }
+    })
   } catch (err) {
-    res.status(500).json({ message: "Registration fail", error: err })
+    return res.status(500).json({
+      message: "Registration failed",
+      error: err
+    })
   }
 }
 
@@ -60,25 +102,6 @@ export const getMyDetails = async (req: AuthRequest, res: Response) => {
   res.status(200).json({ message: "ok", data: { id: user._id, email: user.email, roles: user.roles } })
 }
 
-export const registerAdmin = async (req: Request, res: Response) => {
-  try {
-    const { name, email, password } = req.body
-    const existingUser = await UserModel.findOne({ email })
-    if (existingUser) return res.status(400).json({ message: "Email exists" })
-
-    const hash = await bcrypt.hash(password, 10)
-    const user = await UserModel.create({
-      name,
-      email,
-      password: hash,
-      roles: [UserRole.ADMIN],
-      approved: true
-    })
-    res.status(201).json({ message: "Admin registered", data: { email: user.email, roles: user.roles } })
-  } catch (err) {
-    res.status(500).json({ message: "Internal server error" })
-  }
-}
 
 export const refreshToken = async (req: Request, res: Response) => {
   const { refreshToken: token } = req.body

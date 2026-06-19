@@ -3,7 +3,7 @@ import { Document, model, Schema } from "mongoose"
 export enum UserRole {
   ADMIN = "ADMIN",
   USER = "USER",
-  MANAGER = "MANAGER"
+  DRIVER = "DRIVER"
 }
 
 export interface IUser extends Document {
@@ -11,7 +11,10 @@ export interface IUser extends Document {
   email: string
   password: string
   roles: UserRole[]
-  approved: boolean
+  licenseNumber?: string
+  licenseExpiry?: Date
+  experienceYears?: number
+  emergencyContact?: string
 }
 
 const userSchema = new Schema<IUser>(
@@ -24,7 +27,10 @@ const userSchema = new Schema<IUser>(
       enum: Object.values(UserRole),
       default: [UserRole.USER]
     },
-    approved: { type: Boolean, default: false }
+    licenseNumber: { type: String, sparse: true }, 
+    licenseExpiry: { type: Date },
+    experienceYears: { type: Number, default: 0 },
+    emergencyContact: { type: String }
   },
   { timestamps: true }
 )

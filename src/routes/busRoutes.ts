@@ -7,7 +7,7 @@ import { uploadLicense } from "../middleware/upload"
 
 const router = Router()
 
-router.get("/", authenticate, getAllBuses)
-router.post("/", authenticate, requireRole([UserRole.ADMIN]), uploadLicense.single('licensePhoto'), addBus)
+router.get("/", authenticate,requireRole([UserRole.ADMIN]), getAllBuses)
+router.post("/", authenticate, requireRole([UserRole.DRIVER]), uploadLicense.single('licensePhoto'), addBus)
 
 export default router
