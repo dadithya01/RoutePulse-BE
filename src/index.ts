@@ -16,13 +16,8 @@ import feedbackRoutes from "./routes/feedbackRoutes"
 dotenv.config()
 
 const app = express()
-app.use(cors({
-  origin: "https://route-pulse-fe.vercel.app", // Match your Vite port
-  credentials: true,               // Required if you use cookies or auth headers
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
 app.use(express.json())
+app.use(cors())
 
 app.use("/api/v1/auth", authRoutes)
 app.use("/api/v1/buses", busRoutes)
@@ -38,15 +33,18 @@ const MONGODB_URI = process.env.MONGODB_URI as string
 mongoose
   .connect(MONGODB_URI)
   .then(() => {
-    console.log("Connected securely to MongoDB Database Cluster 🔌");
-    
-    // Only listen if not in Vercel environment
-    if (process.env.NODE_ENV !== 'production') {
-      app.listen(PORT, () => console.log(`Application actively handling streams on port ${PORT} 🚀`));
-    }
+    console.log("DB connected..!")
+    // app.listen(5000, () => {
+    //   console.log("Server running on port: 50000")
+    // })
   })
   .catch((err) => {
-    console.error("Database connection configuration failed: ", err);
-  });
+    console.error("Reason:", err.message)
+    console.error("Fail to connect DB..!")
+  })
+
+  app.listen(PORT, () => {
+  console.log("Server running on port: ", PORT)
+})
 
   export default app
