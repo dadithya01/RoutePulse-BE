@@ -7,6 +7,7 @@ export interface ITrip extends Document {
   arrivalTime: Date
   fare: number
   bookedSeats: number[]
+  totalSeats: number
 }
 
 const tripSchema = new Schema<ITrip>(
@@ -16,7 +17,8 @@ const tripSchema = new Schema<ITrip>(
     departureTime: { type: Date, required: true },
     arrivalTime: { type: Date, required: true },
     fare: { type: Number, required: true },
-    bookedSeats: { type: [Number], default: [] }
+    bookedSeats: { type: [Number], default: [] },
+    totalSeats: { type: Number, required: true }
   },
   { timestamps: true }
 )

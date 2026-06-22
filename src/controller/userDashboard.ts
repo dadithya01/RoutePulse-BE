@@ -28,10 +28,11 @@ export const getUserDashboard = async (req: AuthRequest, res: Response) => {
       .sort({ createdAt: -1 })
 
     // 3. AVAILABLE TRIPS (simple feed)
-    const trips = await TripModel.find()
-      .populate("routeId")
-      .sort({ departureTime: 1 })
-      .limit(10)
+    const trips = await TripModel.find({ departureTime: { $gte: new Date() } })
+  .populate("routeId")
+  .populate("busId")
+  .sort({ departureTime: 1 })
+  .limit(10)
 
     return res.status(200).json({
       user,

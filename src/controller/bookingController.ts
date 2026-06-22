@@ -52,3 +52,27 @@ export const getMyBookings = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: "Server error" })
   }
 }
+
+// controllers/bookingController.ts
+export const cancelBooking = async (req: AuthRequest, res: Response) => {
+  try {
+    const { bookingId } = req.params;
+    
+    // 1. Find the booking
+    const booking = await BookingModel.findById(bookingId);
+    if (!booking) return res.status(404).json({ message: "Booking not found" });
+
+    // 2. Update status
+    booking.status = "CANCELLED";
+    await booking.save();
+
+    // 3. Remove seats from the Trip document
+    await TripModel.findByIdAndUpdate(booking.tripId, {
+      $pull: { bookedSeats: { $in: booking.seatNumbers } }
+    });
+
+    res.status(200).json({ message: "Booking cancelled successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Cancellation failed", error: err });
+  }
+};
