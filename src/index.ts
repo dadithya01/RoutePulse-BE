@@ -38,11 +38,15 @@ const MONGODB_URI = process.env.MONGODB_URI as string
 mongoose
   .connect(MONGODB_URI)
   .then(() => {
-    console.log("Connected securely to MongoDB Database Cluster 🔌")
-    app.listen(PORT, () => console.log(`Application actively handling streams on port ${PORT} 🚀`))
+    console.log("Connected securely to MongoDB Database Cluster 🔌");
+    
+    // Only listen if not in Vercel environment
+    if (process.env.NODE_ENV !== 'production') {
+      app.listen(PORT, () => console.log(`Application actively handling streams on port ${PORT} 🚀`));
+    }
   })
   .catch((err) => {
-    console.error("Database connection configuration failed: ", err)
-  })
+    console.error("Database connection configuration failed: ", err);
+  });
 
   export default app
